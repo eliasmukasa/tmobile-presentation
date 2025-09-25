@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elias Kizito | T-Mobile Strategic Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tmobile-magenta: #E20074;
+            --crl-blue: #2563EB;
+            --stock-green: #22c55e;
+            --stock-red: #ef4444;
+            --bg-dark: #0A0A0A;
+            --bg-light: #F5F5F5;
+            --card-dark: #141414;
+            --card-light: #FFFFFF;
+            --border-dark: #262626;
+            --border-light: #E5E5E5;
+            --text-primary-dark: #FAFAFA;
+            --text-primary-light: #171717;
+            --text-secondary-dark: #A3A3A3;
+            --text-secondary-light: #737373;
+        }
+        html {
+            --bg: var(--bg-dark);
+            --card-bg: var(--card-dark);
+            --border: var(--border-dark);
+            --text-primary: var(--text-primary-dark);
+            --text-secondary: var(--text-secondary-dark);
+            scrollbar-color: var(--border-dark) var(--bg-dark);
+        }
+        html:not(.dark) {
+            --bg: var(--bg-light);
+            --card-bg: var(--card-light);
+            --border: var(--border-light);
+            --text-primary: var(--text-primary-light);
+            --text-secondary: var(--text-secondary-light);
+            scrollbar-color: var(--border-light) var(--bg-light);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-secondary); transition: background-color 0.3s ease, color 0.3s ease; }
+        .t-magenta { color: var(--tmobile-magenta); }
+        .t-magenta-bg { background-color: var(--tmobile-magenta); }
+        .t-magenta-border { border-color: var(--tmobile-magenta); }
+        .crl-blue { color: var(--crl-blue); }
+        .crl-blue-bg { background-color: var(--crl-blue); }
+        .crl-blue-border { border-color: var(--crl-blue); }
+        .card { background-color: var(--card-bg); border-color: var(--border); transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease-out; }
+        .text-primary { color: var(--text-primary); transition: color 0.3s ease; }
+        .text-secondary { color: var(--text-secondary); transition: color 0.3s ease; }
+        .border-color { border-color: var(--border); transition: border-color 0.3s ease; }
+        .btn-secondary { background-color: var(--card-bg); border-color: var(--border); }
+        .btn-secondary:hover { background-color: var(--border); }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s cubic-bezier(0.215, 0.610, 0.355, 1) 0.2s, transform 0.6s cubic-bezier(0.215, 0.610, 0.355, 1) 0.2s;
+        }
+        .fade-in-up.is-visible { opacity: 1; transform: translateY(0); }
+        
+        .modal { backdrop-filter: blur(8px); }
+        .modal-content { transition: transform 0.3s cubic-bezier(0.215, 0.610, 0.355, 1), opacity 0.3s ease; }
+        
+        @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .ticker-animate { animation: ticker-scroll 35s linear infinite; }
+
+        .accordion-content { overflow: hidden; transition: max-height 0.4s ease-in-out; }
+        .accordion-trigger svg { transition: transform 0.3s ease; }
+        .accordion-trigger.open svg { transform: rotate(180deg); }
+
+        .loader-container { z-index: 100; transition: opacity 0.5s ease-out; }
+        .loader-bar { transform-origin: left; }
+        
+        html.presenter-mode { scrollbar-width: none; }
+        html.presenter-mode::-webkit-scrollbar { display: none; }
+        .presenter-mode #sidebar-nav-container, .presenter-mode #header-container, .presenter-mode footer { display: none; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="cursor-gradient"></div>
+
+    <!-- Loader -->
+    <div id="loader" class="loader-container fixed inset-0 bg-[var(--bg)] flex flex-col items-center justify-center">
+        <div class="w-64 text-center">
+             <svg class="w-16 h-16 mx-auto t-magenta" viewBox="0 0 100 100"><path fill="currentColor" d="M50 5c-24.81 0-45 20.19-45 45s20.19 45 45 45 45-20.19 45-45S74.81 5 50 5zm0 18.5c14.63 0 26.5 11.87 26.5 26.5S64.63 76.5 50 76.5 23.5 64.63 23.5 50 35.37 23.5 50 23.5zm0 5c-11.87 0-21.5 9.63-21.5 21.5S38.13 71.5 50 71.5 71.5 61.87 71.5 50 61.87 28.5 50 28.5z"></path></svg>
+             <p class="mt-4 text-primary font-semibold">Initializing Strategic Blueprint...</p>
+             <p class="text-sm text-secondary">Elias M. Kizito</p>
+             <div class="w-full h-1 mt-4 bg-[var(--border)] rounded-full overflow-hidden">
+                 <div id="loader-bar" class="loader-bar h-1 t-magenta-bg" style="transform: scaleX(0);"></div>
+             </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="opacity-0 transition-opacity duration-500 flex">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar-nav-container" class="hidden lg:flex sticky top-0 h-screen w-80 border-r border-color p-6 flex-col">
+            <div class="flex items-center gap-4">
+                <img src="https://res.cloudinary.com/dtrnpryf8/image/upload/v1750329381/prof-pic-ellz_iqnmhu.jpg" alt="Elias Kizito" class="h-14 w-14 rounded-full border-2 border-[var(--tmobile-magenta)] object-cover">
+                <div>
+                    <h2 class="font-bold text-lg text-primary">Elias M. Kizito</h2>
+                    <p class="text-xs text-secondary">Client Partner, Enterprise Sales</p>
+                </div>
+            </div>
+            <ul id="sidebar-nav" class="mt-12 space-y-2"></ul>
+
+            <div class="mt-auto pt-8">
+                 <p class="text-xs text-secondary font-semibold mb-2">CONTROLS</p>
+                 <button id="dark-toggle" class="w-full text-left flex items-center gap-3 p-2 rounded-md text-primary font-semibold transition-colors hover:bg-[var(--border)]">
+                    <!-- Icons will be injected here -->
+                    <span>Toggle Theme (D)</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-1 min-w-0">
+            <!-- Header -->
+            <header id="header-container" class="sticky top-0 z-40 bg-[var(--bg)]/80 backdrop-blur-sm border-b border-color">
+                 <div class="max-w-7xl mx-auto flex items-center justify-end p-2">
+                    <button id="presenter-toggle" title="Toggle Presenter Mode (P)" class="px-3 py-1.5 inline-flex items-center gap-2 rounded-md border border-color bg-card hover:bg-border transition-colors text-sm font-semibold text-primary">
+                        <!-- Icons will be injected here -->
+                        <span>Presenter Mode</span>
+                    </button>
+                 </div>
+            </header>
+
+            <main id="main-content" class="p-4 md:p-8 lg:p-12">
+                <!-- SECTIONS WILL BE INJECTED HERE -->
+            </main>
+
+            <footer class="text-center p-8 border-t border-color text-sm text-secondary">
+                This Executive Briefing was prepared by Elias M. Kizito for the T-Mobile Enterprise Team.
+            </footer>
+        </div>
+    </div>
+    
+    <!-- Floating Presenter Controls -->
+    <div id="presenter-controls" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 opacity-0 pointer-events-none transition-opacity">
+        <button id="presenter-prev-btn" class="h-12 w-12 flex items-center justify-center rounded-full btn-secondary shadow-lg"><svg class="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+        <button id="presenter-next-btn" class="h-12 w-12 flex items-center justify-center rounded-full btn-secondary shadow-lg"><svg class="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+    </div>
+
+    <!-- MODAL CONTAINER -->
+    <div id="modal-container"></div>
+
+<script>
+// SELF-CONTAINED SCRIPT FOR SINGLE-FILE DEPLOYMENT
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- DATA MODEL (FULL DETAIL) ---
+    const STRATEGY_DATA = {
+        title: "New England Command Center: A Strategic 90-Day Action Plan",
+        subtitle: "Presented to: Alissa Gedman & Rich Hunter | September 26, 2025 | Presented by: Elias M. Kizito",
+        sections: [
+            { id: 'intro', navLabel: 'Introduction', icon: 'BookOpen', title: 'My Approach: From Vendor to Value Partner' },
+            { id: 'methodology', navLabel: 'The 90-Day Plan', icon: 'Timer', title: 'The 30-60-90 Day Methodology' },
+            { id: 'foundation-deep-dive', navLabel: 'Foundation Deep Dive', icon: 'Users', title: 'The Foundation (Days 1-30): A Deep Dive' },
+            { id: 'bsx', navLabel: 'Boston Scientific', icon: null, title: 'Scenario 1: Boston Scientific' },
+            { id: 'crl', navLabel: 'Charles River Labs', icon: null, title: 'Scenario 2: Charles River Labs' },
+            { id: 'accelerator', navLabel: '60-Day Accelerator', icon: 'Rocket', title: 'The 60-Day Accelerator' },
+            { id: 'impact', navLabel: '90-Day Impact', icon: 'BarChart3', title: 'The 90-Day Impact: Delivering Early Wins'},
+            { id: 'summary', navLabel: 'Consolidated Plan', icon: 'ListChecks', title: 'Consolidated 90-Day Action Plan' },
+            { id: 'conclusion', navLabel: 'Conclusion', icon: 'Target', title: 'Conclusion: The T-Mobile Lifeline' }
+        ],
+        intro: {
+            content: `My approach is about more than just selling wireless services; it's about architecting true, value-based partnerships. This is my playbook for delivering immediate impact while building a foundation for durable, long-term growth. It's a discipline I've used successfully throughout my career, including growing a new enterprise account from zero to $4.5M in ARR by focusing on the client's core transformation goals from day one.<br><br>This plan will detail my specific strategies for two key opportunities: driving a major <span class="t-magenta font-semibold">expansion</span> at Boston Scientific and executing a successful <span class="crl-blue font-semibold">re-acquisition</span> to win back Charles River Labs. For both, the goal is to establish T-Mobile as an indispensable strategic <span class="t-magenta font-semibold">lifeline</span>—the core fabric for their innovation and operational excellence.`
+        },
+        methodology: {
+            phases: [
+                { days: '1-30', title: 'Foundation: Intelligence & Credibility', description: 'Meticulous intelligence gathering, internal alignment, and establishing the credibility required for strategic engagement. This phase is about listening, learning, and mapping the terrain.' },
+                { days: '31-60', title: 'Acceleration: Momentum & Validation', description: 'Building momentum through targeted client engagement, co-creation of value, and the validation of initial hypotheses. This phase is about converting research into tangible action.' },
+                { days: '61-90', title: 'Impact: Execution & Expansion', description: 'Executing initial wins, measuring tangible results, and architecting the framework for strategic, multi-year expansion. This phase is about delivering value and building long-term partnerships.' }
+            ]
+        },
+        foundationDeepDive: {
+            description: "The initial 30 days are the most critical. Below is a detailed breakdown of the foundational pillars that will be established. These actions set the stage for all subsequent success.",
+            pillars: [
+                { name: "Internal Alignment & Debrief", icon: 'Users', bullets: [], subSections: [
+                    { title: "Boston Scientific (Expansion)", items: ["Meet with the current T-Mobile account team and IoT specialists managing the relationship.", "Gather all existing engagement data: deployed IoT solutions, current mobility usage (division, line count), and history of prior proposals or challenges.", "Identify incumbent carrier footprint (who holds the other 90% of mobility?) and collect internal reports, past RFP results, and coverage maps for their Marlborough, MA HQ and other key sites."] },
+                    { title: "Charles River Labs (Acquisition)", items: ["Meet with the previous sales team who handled the RFP two years ago to understand precisely why we lost. Was it coverage, price, or incumbent relationship?", "Gather any post-mortem documentation or anecdotal feedback. If the issue was price, prepare a new TCO/ROI model. If it was coverage, arm myself with updated network maps and third-party data (e.g., Opensignal reports).", "Research CRL's digital transformation and their goal to become a 'digitally-enabled trusted partner,' ensuring our new approach aligns with their strategic direction, not just tactical needs."] }
+                ]},
+                { name: "External Intelligence & Value Hypotheses", icon: 'Search', bullets: ["Perform a detailed analysis of the last 2-3 years of financial filings (10-K forms), investor day presentations, and corporate responsibility reports for both companies to surface executive-backed strategic imperatives.", "Formulate concise, powerful Value Hypotheses for each account to frame the entire engagement strategy."], notes: [ { label: "BSX Value Hypothesis", text: "T‑Mobile's nationwide 5G fabric will connect BSX's innovation engine (IoMT, clinical trials) with its operational excellence engine (smart factories, resilient supply chain) to drive both improved patient outcomes and enhanced shareholder value." }, { label: "CRL Value Hypothesis", text: "T‑Mobile's Advanced Network Solutions will power CRL's 'Lab of the Future'—providing the speed, security, and reliability required to help shave a year off the drug development lifecycle." } ], dossierTriggers: ['intelligence-dossier-trigger'] },
+                { name: "Stakeholder Mapping & Persona Dossiers", icon: 'Map', bullets: ["Systematically identify and categorize all potential stakeholders into four primary groups: Decision‑Makers, Influencers, Users, and Blockers.", "Develop detailed Target Persona Dossiers for Boston Scientific (expansion) and Charles River Labs (acquisition), moving beyond titles to understand individual motivations and pain points."], dossierTriggers: ['bsx-dossier-trigger', 'crl-dossier-trigger'] },
+                { name: "Initial Credibility Plays", icon: 'Shield', bullets: ["For Boston Scientific, execute a 'listening tour' introduction with the incumbent T-Mobile team to understand history and challenges, with the goal of expanding from a single persona to at least 5-7 key stakeholders.", "For Charles River Labs, reframe the conversation completely away from the lost RFP. The new, value-based introduction will leverage a relevant case study, such as the VA's secure telehealth program, to engage new digital transformation leaders."] }
+            ]
+        },
+        bsx: {
+            subHeader: "From Connectivity Vendor to Value Fabric Partner",
+            stock: { ticker: 'NYSE: BSX', price: '$98.50', change: '-0.48', percent: '(-0.48%)', isUp: false },
+            current: ["Small IoT foothold in one division.", "A mere 10% share of mobility.", "Relationship with a single persona.", "53k+ Employees / 16 Mfg. Facilities", "Financial Snapshot"],
+            prongs: [
+                { name: "Enhance the 'Innovative Care' Engine", icon: 'Globe2', opportunity: "BSX's <a href='https://www.bostonscientific.com/en-US/products/remote-patient-monitoring/latitude-nxt.html' target='_blank' rel='noopener noreferrer' class='underline t-magenta hover:opacity-80'>LATITUDE™</a> Remote Patient Management system already lists T-Mobile as a supported cellular carrier. This existing technical integration is the perfect wedge for a strategic conversation.", action: "Propose and execute a 'Next-Gen IoMT Connectivity Workshop' to discuss how our 5G network can enhance their entire remote patient monitoring portfolio with improved reliability, lower latency, and global roaming support.", targets: ["Director of R&D (Cardiology)", "LATITUDE™ PM", "VP, Digital Health"] },
+                { name: "Fortify the 'High Performance' Engine", icon: 'Factory', opportunity: "BSX has a stated corporate objective to <a href='https://www.bostonscientific.com/content/dam/bostonscientific/corporate/corporate-responsibility/performance-report/our-approach-to-a-resilient-supply-chain.pdf' target='_blank' rel='noopener noreferrer' class='underline t-magenta hover:opacity-80'>improve supply chain resilience</a>, and its 16 principal manufacturing facilities are prime candidates for Industry 4.0 solutions.", action: "Propose a paid pilot for IoT Asset Tracking or 5G FWA at their Marlborough, MA, headquarters. This quick win offers immediate ROI and serves as the foundational step toward deploying a full Private 5G Network.", targets: ["VP Global Supply Chain", "Director Manufacturing Ops", "Site Plant Manager"] },
+                { name: "Empower the 'Global Collaboration' Engine", icon: 'Network', opportunity: "With 53,000 global employees and geographically dispersed clinical trials, mobility is mission-critical. Our current 10% share represents a significant under-penetration and an opportunity for consolidation.", action: "Reframe the mobility conversation from cost-per-line to business value. We will focus on security (SASE), productivity (in-flight Wi-Fi), budget predictability (5-Year Price Guarantee), and leveraging T-Mobile's partnership with Starlink to provide a revolutionary comms failover for hard-to-reach clinical trial sites or key personnel.", targets: ["CIO", "CISO", "VP Sales Ops", "Head of Clinical Trial Ops"] },
+            ]
+        },
+        crl: {
+            subHeader: "The T-Mobile Lifeline: Powering the Lab of the Future",
+            stock: { ticker: 'NYSE: CRL', price: '$155.39', change: '-1.60', percent: '(-1.02%)', isUp: false },
+            current: ["Lost Mobility RFP ~2 years ago.", "Locked in with incumbent competitor.", "Major Digital Transformation.", "~20k employees globally.", "New Strategic Imperatives."],
+            narrative: `The re-engagement must begin by acknowledging the past while immediately pivoting to the future. The opening narrative: "A great deal has changed in two years for both of our organizations. T-Mobile has built the nation's largest and fastest 5G network. Charles River Labs has embarked on an ambitious digital transformation, in partnership with McKinsey, with the goal of shaving a year off the drug development process. The conversation today is not about the RFP from two years ago; it is about whether T-Mobile's network of the future can power CRL's <a href='https://www.criver.com/about-us' target='_blank' rel='noopener noreferrer' class='underline crl-blue hover:opacity-80'>Lab of the Future</a>."`,
+            prongs: [
+                 { name: "Enable the 'Digitally-Enabled Partner' Vision", icon: 'Cpu', opportunity: "CRL's investments in digital pathology, lab automation, and AI demand massive bandwidth and ultra-low latency that traditional Wi-Fi and wired networks often fail to provide consistently across complex laboratory environments.", action: "Propose a 'Lab of the Future Connectivity Briefing' to position our 5G Advanced Network Solutions as 'Wireless Fiber'—offering the speed of fiber with the flexibility of wireless.", targets: ["Chief Digital Officer", "CIO", "Head of Lab Ops", "VP R&D Tech"]},
+                 { name: "Underpin the 'Data Integrity' Mandate", icon: 'Lock', opportunity: "As a leading Contract Research Organization (CRO), data integrity is non-negotiable for CRL (e.g. <a href='https://www.fda.gov/regulatory-information/search-fda-guidance-documents/part-11-electronic-records-electronic-signatures-scope-and-application' target='_blank' rel='noopener noreferrer' class='underline crl-blue hover:opacity-80'>21 CFR Part 11</a>). The network responsible for transporting this highly sensitive data must be equally secure and reliable.", action: "Follow the briefing with a security-focused workshop on how Private 5G provides a physically separate, air-gapped network—a superior security posture for sensitive pre-clinical and manufacturing data.", targets: ["CISO", "Director IT Infra", "Head of Quality & Compliance"] },
+                 { name: "Connect the 'Global Research' Enterprise", icon: 'Globe2', opportunity: "CRL operates a global network of facilities and has adopted agile methodologies to improve collaboration. Seamless connectivity is essential to this new way of working.", action: "After gaining traction, we will re-introduce mobility as a tool for accelerating their 'agile ways of working,' leveraging our Starlink partnership to ensure 100% connectivity uptime for critical remote research sites.", targets: ["Head of Global Ops", "CIO", "Head of Procurement"] },
+            ]
+        },
+        accelerator: {
+            description: "The 60-day phase is designed to transition from intelligence gathering and planning to active, value-creating engagement. A key focus is the strategic expansion of our stakeholder map—leveraging initial contacts from the first 30 days to create a 'snowball effect' of introductions and deepen our organizational intelligence.",
+            bsx: { title: "Boston Scientific", actions: ["Execute the 'Next-Gen IoMT Connectivity Workshop' with the Digital Health and R&D teams, focusing on the future needs of their LATITUDE™ platform.", "Present the formal proposal for the IoT Asset Tracking or Fixed Wireless Access pilot at the Marlborough manufacturing facility."], kpi: "Secure an agreement for a follow-up technical deep dive with T-Mobile Solution Engineers and get the pilot proposal into the procurement and legal review process." },
+            crl: { title: "Charles River Labs", actions: ["Conduct the initial 'Lab of the Future Connectivity Briefing' with a senior technology or innovation leader.", "Deliver the 5G Business Internet or IoT pilot proposal for a redundant connectivity trial at a critical lab.", "Execute on initial Trust-Building Gestures, such as a complimentary on-site network audit."], kpi: "Secure an internal 'champion' at CRL who recognizes the strategic value, and secure a verbal agreement to proceed with a low-risk pilot." }
+        },
+        impact: {
+            bsx: { speed: "Signed contract for the IoT Asset Tracking or FWA pilot program, representing an initial ARR of approximately $50,000-$100,000.", growth: "Establishment of a joint 'T-Mobile ✕ Boston Scientific Growth Roadmap' working group to develop a technical and business plan for a Private 5G network. Active, qualified discussions will be underway with at least two new business units.", kpi: "The qualified sales pipeline for the account will have grown by over $2M. Leverage the expanded stakeholder network by distributing tailored executive briefs and 1-pagers to socialize progress 'wide and deep' within the organization." },
+            crl: { speed: "Signed contract for the 5G Business Internet or IoT trial, marking the successful re-entry into the account. This is 'The Magenta Comeback' in action.", growth: "The goodwill and credibility earned from the successful pilot and trust-building gestures will be leveraged to schedule a formal requirements-gathering session for a broader Private Network Proof of Concept (PoC).", kpi: "A new, qualified opportunity for a Private Network PoC (valued at approximately $500,000+) will be created in the pipeline. Progress will be socialized with new executive contacts to build consensus." },
+        },
+        summary: {
+            rows: [
+                 { phase: "30 Days", account: "Boston Scientific", actions: "Internal alignment; deep external research; 'listening tour'.", kpi: "Value Hypothesis validated; new Supply Chain & R&D contacts identified.", outcome: "Foundation for multi-threaded expansion established." },
+                 { phase: "30 Days", account: "Charles River Labs", actions: "Identify digital transformation leaders; craft new value prop; value-based outreach.", kpi: "Initial briefing with a senior technology leader secured.", outcome: "Re-engagement achieved on strategic, not tactical, terms." },
+                 { phase: "60 Days", account: "Boston Scientific", actions: "Execute IoMT Workshop; present IoT Asset Tracking/FWA pilot proposal.", kpi: "Technical deep-dive scheduled; pilot in procurement.", outcome: "Speed to Sale: Pilot contract moving toward close." },
+                 { phase: "60 Days", account: "Charles River Labs", actions: "Conduct 'Lab of the Future' briefing; deliver pilot proposal; execute trust-building gestures.", kpi: "Internal champion secured; verbal agreement for trial.", outcome: "Speed to Sale: First commercial win imminent." },
+                 { phase: "90 Days", account: "Boston Scientific", actions: "Finalize pilot contract; launch joint working group for Private 5G.", kpi: "Pilot contract signed; Private 5G roadmap sessions scheduled.", outcome: "~$100k pilot closed; $2M+ in new pipeline created." },
+                 { phase: "90 Days", account: "Charles River Labs", actions: "Finalize trial contract; leverage goodwill for PoC requirements session.", kpi: "Trial contract signed; PoC session on calendar.", outcome: "Trial contract closed; qualified PoC ($500k+) in pipeline." },
+            ]
+        },
+        conclusion: {
+            content: `This 90-day plan presents an ambitious but achievable roadmap. It is rooted in a deep, analytical understanding of each client's unique strategic imperatives and is designed to deliver immediate, tangible value while simultaneously building the foundation for multi-million dollar strategic partnerships. This is a repeatable framework that has been used successfully throughout a career of surpassing sales quotas and driving significant enterprise growth. By executing this plan with discipline and strategic focus, I am confident I can deliver exceptional results for T-Mobile in the New England market. This approach underscores that both T-Mobile and its partners are in the business of long-term value creation. As I like to say, <strong class="text-primary italic">"If at first you don’t succeed, listen, learn, and 5G again."</strong>`
+        },
+        dossiers: {
+            bsx: {
+                title: "Boston Scientific Intel Dossiers",
+                personas: [
+                    { title: 'The IoMT Product Manager', role: 'LATITUDE™ Platform Lead', priority: 'Reliability & Future-Proofing', pain: 'Legacy cellular tech limits new real-time features; global deployments are complex.', approach: "Position 5G as the enabler for next-gen, low-latency monitoring. Showcase T-Mobile's global IoT platform to simplify worldwide deployments." },
+                    { title: 'The Supply Chain Director', role: 'Global Operations', priority: 'Resilience & Efficiency', pain: 'Lack of real-time visibility into high-value assets across 16 manufacturing sites leads to potential loss and inefficiency.', approach: "Propose an IoT Asset Tracking pilot with clear ROI on loss prevention. Frame this as Step 1 in a larger 'Smart Factory' journey with Private 5G." },
+                    { title: 'The Chief Information Officer', role: 'Enterprise IT & Digital', priority: 'Security & Global Collaboration', pain: 'Managing a fragmented mobility landscape is costly and creates security vulnerabilities for sensitive R&D and clinical trial data.', approach: "Shift from a cost-per-line to a value conversation around our SASE security framework, productivity tools, and predictable budgeting with the Price Lock guarantee." }
+                ],
+                table: {
+                    headers: ['Persona', 'Business Unit', 'Key Priority', 'T-Mobile Value Prop', 'Proposed Engagement'],
+                    rows: [
+                        ['VP, Digital Health', 'Cardiology/R&D', 'Improving patient outcomes via remote monitoring.', '5G reliability & future-proofing for the LATITUDE™ platform.', 'Next-Gen IoMT Connectivity Workshop'],
+                        ['VP, Global Supply Chain', 'Operations', 'Building a resilient, efficient global supply chain.', 'Real-time asset visibility; secure connectivity for smart factories.', 'IoT Tracking Pilot & Private 5G Roadmap'],
+                        ['CIO / CISO', 'Information Technology', 'Enabling secure global collaboration & mobile endpoints.', 'Secure global connectivity with predictable costs (Price Lock).', 'Enterprise Mobility Value Assessment'],
+                        ['Director, Manufacturing', 'Operations', 'Increasing factory uptime and operational efficiency.', 'Predictive maintenance and precision tracking via Private 5G.', 'Paid Pilot Program for IoT Asset Tracking']
+                    ]
+                },
+                mobility: {
+                    title: "BSX Mobility & Quick Win Roadmap",
+                    subtitle: "A multi-pronged approach to rapidly grow from 10% share of mobility.",
+                    sections: [
+                        { title: "Quick Win Projects (Days 40-60)", icon: 'Rocket', items: [
+                            { name: "Targeted Mobility Expansion", detail: "Identify a business unit or new team not under a long-term contract and propose an immediate switch for 50-100 lines. We will create a compelling incentive package (e.g., device upgrade credits, first month free) and emphasize speed, pitching a seamless transition within 2 weeks." },
+                            { name: "Strategic IoT Pilot", detail: "Leverage our existing IoT foothold in Cardiology to propose a no-risk expansion pilot in another division like Neuromodulation or Endoscopy. A small-scale, 3-month trial to connect 20 devices will prove value and get our SIMs into more of their product ecosystem quickly." },
+                            { name: "5G FWA Trial", detail: "For any BSX remote offices or labs struggling with broadband, offer a trial of T-Mobile’s 5G Enterprise Internet. This fast-turnaround service showcases our 5G network's power in a new and tangible way beyond mobile phones." },
+                            { name: "Cost Savings Analysis", detail: "Offer to perform a quick, high-level cost audit of their current carrier bills. By identifying potential 20%+ savings on items like international roaming or data overages, we can create a powerful, data-driven urgency for a quick-win switch." }
+                        ]},
+                        { title: "Mid-Term Expansion Plan (Day 60+)", icon: 'Map', items: [
+                            { name: "The Growth Roadmap Proposal", detail: "Translate discovery findings into a consultative 'T-Mobile ✕ Boston Scientific Growth Roadmap.' This strategic document will outline a phased approach: Phase 1 (Quick Wins), Phase 2 (Expansion to new divisions by Q4), and Phase 3 (Long-term partnership with advanced 5G solutions like Private Networks)." },
+                            { name: "Building Internal Consensus", detail: "This document is designed not as a quote, but as a mini-strategy that our internal champions at BSX can circulate to build consensus. It will include high-level ROI and value analysis (projected savings, productivity gains) to frame it as a strategic business improvement plan." }
+                        ]},
+                        { title: "Internal T-Mobile Support (Days 40-60)", icon: 'Users', items: [
+                            { name: "Securing Execution Resources", detail: "Proactively secure any necessary internal support, such as special pricing approvals for pilots or dedicated resources for a seamless onboarding experience." },
+                            { name: "Executive Alignment", detail: "Keep T-Mobile leadership apprised of the expanding dialogue. This ensures that if executive air cover is needed (e.g., a VP to call on the BSX CIO), it is ready to be deployed, demonstrating our commitment at all levels." }
+                        ]}
+                    ]
+                }
+            },
+            crl: {
+                title: "Charles River Labs Intel Dossiers",
+                personas: [
+                    { title: 'The Head of Lab Automation', role: 'Lab of the Future Initiative', priority: 'Operational Uptime & Throughput', pain: 'Intermittent Wi-Fi connectivity causes bottlenecks for robotic systems and high-throughput data scanners, slowing down research cycles.', approach: "Introduce 5G ANS as 'Wireless Fiber' in a 'Lab of the Future' briefing. Offer a trial of 5G Business Internet to prove reliability and eliminate a key bottleneck." },
+                    { title: 'The Director of Digital Pathology', role: 'R&D Technology', priority: 'Data Transfer Speed', pain: 'Transferring massive, high-resolution image files between global research sites is slow and cumbersome, hindering collaboration.', approach: "Showcase the raw bandwidth and low-latency of our 5G network, positioning it as the infrastructure that can accelerate, not hinder, their cutting-edge research." },
+                    { title: 'The Chief Information Security Officer', role: 'IT Security & Compliance', priority: 'Data Integrity & Compliance (21 CFR Part 11)', pain: 'Shared networks like Wi-Fi pose a risk for highly sensitive, regulated pre-clinical and manufacturing data.', approach: "Conduct a security-focused workshop on the superior, air-gapped security posture of a Private 5G network, directly addressing their core compliance and data integrity mandates." }
+                ],
+                table: {
+                    headers: ['Persona', 'Pains/Priorities', 'Old Conversation (The Lost RFP)', 'New Conversation (The Lifeline)', 'T-Mobile Solution'],
+                    rows: [
+                        ['Chief Digital Officer', 'Accelerating drug development; "Lab of the Future"', 'Cost per mobile line; device subsidies.', 'Providing the low-latency fabric for lab automation & AI.', 'Private 5G / Advanced Network Solutions'],
+                        ['CISO', 'Data integrity; 21 CFR Part 11; cybersecurity threats.', 'Standard mobile device security features.', 'Securing mission-critical lab data with an air-gapped network.', 'Private 5G Network for enhanced security'],
+                        ['Head of Lab Ops', 'Operational uptime; scaling new technologies.', 'Employee connectivity and coverage issues.', 'Eliminating connectivity bottlenecks for robotics & scanners.', '5G Business Internet (as backup); Private 5G'],
+                        ['Head of Procurement', 'Cost containment; vendor management.', 'Price per GB; total cost of ownership.', 'Budget predictability & enabling strategic business goals.', 'Enterprise Mobility (re-framed)']
+                    ]
+                },
+                redemption: {
+                    title: "The Redemption Arc Roadmap",
+                    subtitle: "A detailed plan to rebuild trust, demonstrate value, and secure a strategic foothold.",
+                    sections: [
+                        { title: "Trust-Building Gestures (Days 30-60)", icon: 'Shield', items: [
+                            { name: "Complimentary Network Audit", detail: "Offer to have our engineers conduct a free, no-obligation on-site coverage check or solution audit of their current setup. This provides immediate value and helps us identify pain points the incumbent may be missing." },
+                            { name: "Hyper-Responsiveness", detail: "Signal the superior level of service they will receive by turning around any request for information with exceptional speed and thoroughness. A quickly-delivered transition plan, for example, demonstrates proactive expertise." },
+                            { name: "Cultivate Internal Champions", detail: "As conversations progress, identify and nurture allies within CRL. A networking manager excited by our 5G tech or a finance lead intrigued by potential savings can become a powerful internal advocate." }
+                        ]},
+                        { title: "The 'Why T-Mobile, Why Now' Value Prop", icon: 'Info', items: [
+                            { name: "Network Superiority", detail: "Present hard data and third-party reports (e.g., Ookla) to showcase our dramatic 5G network improvements in their key locations since the last RFP. This isn't the same network they reviewed two years ago." },
+                            { name: "Innovation Partnership", detail: "Differentiate T-Mobile by focusing on their 'Lab of the Future' vision. Pitch how Private 5G can enable AR/VR for remote pathology or real-time AI analytics—positioning us as a tech partner, not a commodity vendor." },
+                            { name: "'The Magenta Comeback' Narrative", detail: "Frame the entire proposal as a story of resilience and improvement. We listened, we invested, and we are back better, with a shared vision for accelerating their core mission." }
+                        ]},
+                        { title: "Low-Risk Pilot Proposals (The 'Wedge')", icon: 'Rocket', items: [
+                            { name: "Strategic IoT Pilot", detail: "Propose connecting a subset of lab freezers or delivery vehicles with IoT SIMs for 3 months. This is a non-disruptive way to address a niche need and showcase our platform's value." },
+                            { name: "Fixed Wireless Backup", detail: "Offer to install a T-Mobile 5G FWA unit at a critical research site as a backup internet connection. This provides them with a taste of our service reliability with minimal commitment or risk." },
+                             { name: "Network 'Goodwill' Kit", detail: "If a known cellular dead zone exists in one of their facilities, proactively offer to deploy a CellSpot or signal booster. Solving their problem before we have a contract is a powerful demonstration of our commitment." }
+                        ]}
+                    ]
+                },
+                intelligence: {
+                    title: "Key Intelligence Dossier",
+                    subtitle: "Publicly available documents driving our strategic approach.",
+                    links: [
+                        {
+                            company: "Boston Scientific",
+                            logo: "https://logo.clearbit.com/bostonscientific.com",
+                            items: [
+                                { label: "2024 Annual Report (10-K)", url: "https://investors.bostonscientific.com/~/media/Files/B/Boston-Scientific-IR-V3/annual-reports-proxy-statements/2025/bsc-2024-annual-report-and-10-k.pdf" },
+                                { label: "Latest Investor Presentation", url: "https://investors.bostonscientific.com/events-and-presentations" },
+                                { label: "2024 Performance Report", url: "https://www.bostonscientific.com/content/dam/bostonscientific/corporate/corporate-responsibility/performance-report/BostonScientific2024PerformanceReport.pdf" }
+                            ]
+                        },
+                        {
+                            company: "Charles River Labs",
+                            logo: "https://logo.clearbit.com/criver.com",
+                            items: [
+                                { label: "2024 Annual Report (10-K)", url: "https://ir.criver.com/static-files/5f7220a8-d473-4596-bcf8-b827367f97de" },
+                                { label: "Latest Investor Presentation", url: "https://s202.q4cdn.com/341148777/files/doc_presentations/09/CRL-2023-Meeting-with-Management_PrintVersion2.pdf" },
+                                { label: "2023 Corporate Citizenship Report", url: "https://ir.criver.com/static-files/07546622-c43c-4554-98b4-6fcf4dafeaf5" }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    };
+
+    // --- SVG ICONS ---
+    const ICONS = { BookOpen: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`, Timer: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><line x1="10" y1="2" x2="14" y2="2"></line><line x1="12" y1="14" x2="12" y2="18"></line><path d="M19 14a7 7 0 1 1-14 0"></path><path d="M12 2v2"></path><path d="M12 18v4"></path></svg>`, Building2: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>`, Building: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><path d="M9 12h6"/><path d="M12 9v6"/><path d="M4 12h2"/><path d="M18 12h2"/></svg>`, ListChecks: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg>`, Target: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>`, Users: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`, Search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`, Map: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>`, Shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`, Globe2: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20z"></path><path d="M2 12h20"></path></svg>`, Factory: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"></path><path d="M17 18h1"></path><path d="M12 18h1"></path><path d="M7 18h1"></path></svg>`, Network: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M12 10v4"/><path d="M12 18v-2"/><path d="M12 8V6"/><path d="M7 15v-4"/><path d="M17 15v-4"/><path d="M7 18v-1"/><path d="M17 18v-1"/><path d="M7 8V6"/><path d="M17 8V6"/></svg>`, Cpu: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M9 2v2"/><path d="M9 20v2"/><path d="M2 9h2"/><path d="M2 15h2"/><path d="M20 9h2"/><path d="M20 15h2"/></svg>`, Lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`, Sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`, Moon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`, BarChart3: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>`, Close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`, Rocket: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.3.05-3.12-.65-.82-2.17-1.43-3.12-1.88zM12 15.5V13a2 2 0 0 0-2-2H8.5a2 2 0 0 0-2 2v2.5a2 2 0 0 0 2 2H10a2 2 0 0 0 2-2zM12 2v4M12 12l8-8M16 4h4v4"/></svg>`, Info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`, Play: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`, Pause: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>` };
+
+    // --- STATE MANAGEMENT ---
+    let state = {
+        dark: true,
+        activeSection: STRATEGY_DATA.sections[0].id,
+        isPresenterMode: false,
+        currentStep: 0
+    };
+
+    // --- DOM REFERENCES ---
+    const appContainer = document.getElementById('app-container');
+    const mainContent = document.getElementById('main-content');
+    const sidebarNav = document.getElementById('sidebar-nav');
+    const darkToggle = document.getElementById('dark-toggle');
+    const modalContainer = document.getElementById('modal-container');
+    const presenterToggle = document.getElementById('presenter-toggle');
+    const presenterControls = document.getElementById('presenter-controls');
+
+    // --- TEMPLATING & RENDERING ---
+    const createSectionHTML = (section) => {
+        let contentHTML = '';
+        let subtitleHTML = '';
+        
+        if (section.id === 'intro') {
+            subtitleHTML = `<p class="mt-2 text-secondary">${STRATEGY_DATA.subtitle}</p>`;
+            contentHTML = `<p class="text-xl leading-relaxed max-w-4xl">${STRATEGY_DATA.intro.content}</p>`;
+        } else {
+             switch(section.id) {
+                case 'methodology':
+                    contentHTML = `<div class="grid md:grid-cols-3 gap-6">${STRATEGY_DATA.methodology.phases.map(p => `
+                        <div class="card border rounded-lg p-6 group hover:-translate-y-1 hover:shadow-2xl">
+                            <h3 class="font-bold text-xl text-primary flex items-center gap-2">${ICONS.Timer} ${p.days}</h3>
+                            <h4 class="font-semibold text-lg text-primary mt-2">${p.title}</h4>
+                            <p class="mt-2 text-base">${p.description}</p>
+                        </div>`).join('')}</div>`;
+                    break;
+                case 'foundation-deep-dive':
+                    contentHTML = `<p class="max-w-4xl text-lg mb-8">${STRATEGY_DATA.foundationDeepDive.description}</p>
+                    <div class="max-w-4xl space-y-4">${STRATEGY_DATA.foundationDeepDive.pillars.map(p => {
+                        const dossierTriggersHTML = p.dossierTriggers ? `<div class="mt-4 flex flex-col sm:flex-row gap-3">${p.dossierTriggers.map(id => {
+                            if(id.includes('intelligence')) {
+                                return `<button data-intelligence-dossier="intel" class="w-full text-center py-2 px-4 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-500 transition">View Key Intelligence Links</button>`;
+                            }
+                            const isBsx = id.includes('bsx');
+                            return `<button data-dossier="${isBsx ? 'bsx' : 'crl'}" class="w-full text-center py-2 px-4 ${isBsx ? 't-magenta-bg' : 'crl-blue-bg'} text-white font-semibold rounded-lg hover:opacity-90 transition">View ${isBsx ? 'BSX' : 'CRL'} Intel Dossiers</button>`
+                        }).join('')}</div>` : '';
+                        
+                        let subSectionHTML = p.subSections ? `<div class="space-y-4 pt-4">${p.subSections.map(sub => `
+                                <div class="pl-4">
+                                     <h5 class="font-semibold text-primary">${sub.title}</h5>
+                                     <ul class="list-disc ml-6 mt-2 space-y-1 text-base">${sub.items.map(i => `<li>${i}</li>`).join('')}</ul>
+                                </div>
+                        `).join('<hr class="border-color my-4">')}</div>` : `<ul class="list-disc ml-6 space-y-2 text-base">${p.bullets.map(b => `<li>${b}</li>`).join('')}</ul>`;
+
+                        return `<div class="accordion-item card border rounded-lg p-4">
+                            <button class="accordion-trigger w-full flex justify-between items-center text-left">
+                                <span class="font-bold text-lg text-primary flex items-center gap-3">${ICONS[p.icon]} ${p.name}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-secondary"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                            <div class="accordion-content max-h-0">
+                                <div class="pt-4 border-t border-color mt-4">
+                                    ${subSectionHTML}
+                                    ${p.notes ? `<div class="mt-4 grid md:grid-cols-2 gap-4">${p.notes.map(n => `<div class="bg-[var(--bg)] p-4 rounded-lg border border-color border-dashed"><h4 class="font-semibold text-primary">${n.label}</h4><p class="text-sm mt-1">${n.text}</p></div>`).join('')}</div>` : ''}
+                                    ${dossierTriggersHTML}
+                                </div>
+                            </div>
+                        </div>`}).join('')}</div>`;
+                    break;
+                case 'bsx':
+                case 'crl':
+                    const data = section.id === 'bsx' ? STRATEGY_DATA.bsx : STRATEGY_DATA.crl;
+                    const isBsx = section.id === 'bsx';
+                    const narrativeHTML = data.narrative ? `<div class="card border rounded-lg p-6 mb-8 text-lg">${data.narrative}</div>` : '';
+                    const stockCardHTML = `
+                        <div class="card border rounded-lg p-4 text-center flex flex-col justify-center group hover:-translate-y-1 hover:shadow-xl">
+                            <p class="text-sm font-semibold text-secondary flex items-center justify-center gap-2"><img src="https://logo.clearbit.com/${isBsx ? 'bostonscientific.com':'criver.com'}" alt="${data.stock.ticker} logo" class="h-5 w-5 bg-white p-0.5 rounded-full"/>${data.stock.ticker}</p>
+                            <p class="text-2xl font-bold text-primary">${data.stock.price}</p>
+                            <p class="text-sm font-semibold flex items-center justify-center ${data.stock.isUp ? 'text-[var(--stock-green)]' : 'text-[var(--stock-red)]'}">
+                                <svg class="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">${data.stock.isUp ? '<path d="M7 14l5-5 5 5z"/>' : '<path d="M7 10l5 5 5-5z"/>'}</svg>
+                                ${data.stock.change} ${data.stock.percent}
+                            </p>
+                        </div>`;
+                    let currentCardsData = [...data.current];
+                    let combinedCard;
+                    if(isBsx){
+                        combinedCard = `<div class="card border rounded-lg p-4 text-center flex flex-col justify-center group hover:-translate-y-1 hover:shadow-xl"><p class="text-lg font-bold t-magenta">${currentCardsData.pop()}</p><p class="text-sm">~$16.7B Sales / ~$1.6B R&D</p></div>`;
+                    }
+                    const currentCards = currentCardsData.map(c => `<div class="card border rounded-lg p-4 text-center flex flex-col justify-center group hover:-translate-y-1 hover:shadow-xl"><p class="text-lg font-bold ${isBsx ? 't-magenta' : 'crl-blue'}">${c.split(' ')[0]}</p><p class="text-sm">${c.substring(c.indexOf(" ") + 1)}</p></div>`).join('');
+                    const currentHTML = `<div class="mb-8"><h3 class="text-2xl font-bold text-primary mb-4">Current State Analysis</h3><div class="grid grid-cols-2 md:grid-cols-3 gap-4">${currentCards}${isBsx ? combinedCard : ''}${stockCardHTML}</div></div>`;
+                    const prongsHTML = data.prongs.map(p => `
+                        <div class="card border rounded-lg overflow-hidden group hover:shadow-2xl hover:-translate-y-1">
+                            <div class="p-6">
+                                <h4 class="font-bold text-xl text-primary flex items-center gap-3">${ICONS[p.icon]} ${p.name}</h4>
+                                <p class="mt-3 text-base"><strong class="text-secondary">Opportunity:</strong> ${p.opportunity}</p>
+                                <p class="mt-2 text-base"><strong class="text-secondary">Action Plan:</strong> ${p.action}</p>
+                            </div>
+                            <div class="px-6 py-3 bg-[var(--bg)] border-t border-color text-sm"><strong class="text-secondary">Target Personas:</strong> ${p.targets.join(', ')}</div>
+                        </div>`).join('');
+                    const mobilityButton = isBsx ? `<div class="mt-6"><button data-mobility-dossier="bsx" class="w-full text-center py-3 px-4 t-magenta-bg text-white font-bold rounded-lg hover:opacity-90 transition text-lg flex items-center justify-center gap-2">${ICONS.Rocket} View Mobility & Quick Win Roadmap</button></div>` : '';
+                    const redemptionButton = !isBsx ? `<div class="mt-6"><button data-redemption-dossier="crl" class="w-full text-center py-3 px-4 crl-blue-bg text-white font-bold rounded-lg hover:opacity-90 transition text-lg flex items-center justify-center gap-2">${ICONS.Shield} View Redemption Arc Roadmap</button></div>` : '';
+
+                    contentHTML = `${currentHTML}${narrativeHTML}<h3 class="text-2xl font-bold text-primary mb-4">Three-Pronged Strategy</h3><div class="space-y-6">${prongsHTML}</div>
+                    <div class="mt-8"><button data-dossier-table="${section.id}" class="w-full text-center py-3 px-4 ${isBsx ? 't-magenta-bg' : 'crl-blue-bg'} text-white font-bold rounded-lg hover:opacity-90 transition text-lg">View Strategic Persona Matrix</button></div>
+                    ${mobilityButton}${redemptionButton}`;
+                    break;
+                 case 'accelerator':
+                    contentHTML = `<p class="max-w-4xl text-lg mb-8">${STRATEGY_DATA.accelerator.description}</p>
+                        <div class="grid lg:grid-cols-2 gap-8">
+                            <div class="card border rounded-lg p-6 group hover:-translate-y-1 hover:shadow-2xl">
+                                <h3 class="text-2xl font-bold text-primary mb-4 flex items-center gap-3"><img src="https://logo.clearbit.com/bostonscientific.com" alt="BSX Logo" class="h-8 w-8 bg-white p-1 rounded-full"/> ${STRATEGY_DATA.accelerator.bsx.title}</h3>
+                                <h4 class="font-semibold text-primary">Key Actions:</h4>
+                                <ul class="list-disc ml-5 my-2 space-y-1">${STRATEGY_DATA.accelerator.bsx.actions.map(a => `<li>${a}</li>`).join('')}</ul>
+                                <h4 class="font-semibold text-primary mt-4">Success Metric (KPI):</h4>
+                                <p class="mt-1">${STRATEGY_DATA.accelerator.bsx.kpi}</p>
+                            </div>
+                            <div class="card border rounded-lg p-6 group hover:-translate-y-1 hover:shadow-2xl">
+                                <h3 class="text-2xl font-bold text-primary mb-4 flex items-center gap-3"><img src="https://logo.clearbit.com/criver.com" alt="CRL Logo" class="h-8 w-8 bg-white p-1 rounded-full"/> ${STRATEGY_DATA.accelerator.crl.title}</h3>
+                                <h4 class="font-semibold text-primary">Key Actions:</h4>
+                                <ul class="list-disc ml-5 my-2 space-y-1">${STRATEGY_DATA.accelerator.crl.actions.map(a => `<li>${a}</li>`).join('')}</ul>
+                                <h4 class="font-semibold text-primary mt-4">Success Metric (KPI):</h4>
+                                <p class="mt-1">${STRATEGY_DATA.accelerator.crl.kpi}</p>
+                            </div>
+                        </div>`;
+                    break;
+                case 'impact':
+                    contentHTML = `<div class="grid lg:grid-cols-2 gap-8">
+                            <div>
+                                <h3 class="text-2xl font-bold text-primary mb-4 flex items-center gap-3"><img src="https://logo.clearbit.com/bostonscientific.com" alt="BSX Logo" class="h-8 w-8 bg-white p-1 rounded-full"/> Boston Scientific Outcomes</h3>
+                                <div class="space-y-4">
+                                    <div class="card border rounded-lg p-6 group hover:-translate-y-1 hover:shadow-2xl">
+                                        <h4 class="font-semibold text-lg t-magenta">Speed to Sale</h4>
+                                        <p class="mt-2">${STRATEGY_DATA.impact.bsx.speed}</p>
+                                    </div>
+                                    <div class="card border rounded-lg p-6 group hover:-translate-y-1 hover:shadow-2xl">
+                                        <h4 class="font-semibold text-lg text-primary">Long-Term Growth</h4>
+                                        <p class="mt-2">${STRATEGY_DATA.impact.bsx.growth}</p>
+                                    </div>
+                                    <div class="card border rounded-lg p-6 t-magenta-border border-2 group hover:-translate-y-1 hover:shadow-2xl">
+                                        <h4 class="font-semibold text-lg text-primary">Key Performance Indicator</h4>
+                                        <p class="mt-2">${STRATEGY_DATA.impact.bsx.kpi}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-primary mb-4 flex items-center gap-3"><img src="https://logo.clearbit.com/criver.com" alt="CRL Logo" class="h-8 w-8 bg-white p-1 rounded-full"/> Charles River Labs Outcomes</h3>
+                                <div class="space-y-4">
+                                    <div class="card border rounded-lg p-6 group hover:-translate-y-1 hover:shadow-2xl">
+                                        <h4 class="font-semibold text-lg crl-blue">Speed to Sale</h4>
+                                        <p class="mt-2">${STRATEGY_DATA.impact.crl.speed}</p>
+                                    </div>
+                                    <div class="card border rounded-lg p-6 group hover:-translate-y-1 hover:shadow-2xl">
+                                        <h4 class="font-semibold text-lg text-primary">Long-Term Growth</h4>
+                                        <p class="mt-2">${STRATEGY_DATA.impact.crl.growth}</p>
+                                    </div>
+                                    <div class="card border rounded-lg p-6 crl-blue-border border-2 group hover:-translate-y-1 hover:shadow-2xl">
+                                        <h4 class="font-semibold text-lg text-primary">Key Performance Indicator</h4>
+                                        <p class="mt-2">${STRATEGY_DATA.impact.crl.kpi}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    break;
+                case 'summary':
+                    const summaryTable = `<div class="card border rounded-lg p-1 overflow-x-auto"><table class="w-full text-left">
+                        <thead><tr class="border-b border-color text-sm text-secondary">${['Phase', 'Account', 'Key Actions', 'KPI', 'Desired Outcome'].map(h => `<th class="p-4 font-semibold">${h}</th>`).join('')}</tr></thead>
+                        <tbody>${STRATEGY_DATA.summary.rows.map(r => `<tr class="border-b border-color last:border-0 hover:bg-[var(--bg)] transition-colors">
+                            <td class="p-4 font-bold text-primary">${r.phase}</td>
+                            <td class="p-4 ${r.account === 'Boston Scientific' ? 't-magenta' : 'crl-blue'} font-semibold">${r.account}</td>
+                            <td class="p-4">${r.actions}</td>
+                            <td class="p-4">${r.kpi}</td>
+                            <td class="p-4 font-semibold text-primary">${r.outcome}</td>
+                        </tr>`).join('')}</tbody>
+                    </table></div>`;
+                    contentHTML = summaryTable;
+                    break;
+                case 'conclusion':
+                     contentHTML = `<p class="text-xl leading-relaxed max-w-4xl">${STRATEGY_DATA.conclusion.content}</p>`;
+                    break;
+            }
+        }
+
+        const titleHTML = section.id === 'intro' ? STRATEGY_DATA.title : section.title;
+
+        const sectionIcon = section.icon ? `<span class="w-12 h-12 flex items-center justify-center rounded-lg card border">${ICONS[section.icon]}</span>` : '';
+
+        return `<section id="${section.id}" class="min-h-screen pt-24 pb-12 fade-in-up">
+            <div class="flex items-center gap-4">
+                ${sectionIcon}
+                <div>
+                     <h2 class="text-3xl lg:text-4xl font-black text-primary tracking-tighter">${titleHTML}</h2>
+                     ${subtitleHTML}
+                     ${section.id === 'bsx' ? `<p class="t-magenta font-semibold text-lg">${STRATEGY_DATA.bsx.subHeader}</p>` : ''}
+                     ${section.id === 'crl' ? `<p class="crl-blue font-semibold text-lg">${STRATEGY_DATA.crl.subHeader}</p>` : ''}
+                </div>
+            </div><div class="mt-8">${contentHTML}</div></section>`;
+    };
+    
+    const createModal = (content) => {
+        const modalHTML = `<div class="modal fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 opacity-0 transition-opacity duration-300">
+            <div class="modal-content w-full ${content.widthClass || 'max-w-6xl'} max-h-[90vh] card border ${content.borderColorClass || ''} border-2 rounded-2xl shadow-2xl p-8 transform scale-95 opacity-0 flex flex-col">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                         <h3 class="text-2xl font-bold text-primary">${content.title}</h3>
+                         <p class="font-semibold ${content.colorClass}">${content.subtitle}</p>
+                    </div>
+                    <button class="close-modal-btn text-secondary hover:text-primary transition-colors">${ICONS.Close}</button>
+                </div>
+                <div class="flex-1 overflow-y-auto pr-2">${content.bodyHTML}</div>
+            </div></div>`;
+        modalContainer.innerHTML = modalHTML;
+        
+        const modal = modalContainer.querySelector('.modal');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modalContent.classList.remove('scale-95', 'opacity-0');
+        }, 10);
+
+        const closeModal = () => {
+            modalContent.classList.add('scale-95', 'opacity-0');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                if (modal) modal.remove()
+            }, 300);
+        };
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        modal.querySelector('.close-modal-btn').addEventListener('click', closeModal);
+    };
+
+    const createDossierModal = (dossierType) => {
+        const data = STRATEGY_DATA.dossiers[dossierType];
+        const isBsx = dossierType === 'bsx';
+        const bodyHTML = `<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">${data.personas.map(d => `
+            <div class="card border rounded-lg p-6">
+                <h4 class="font-bold text-lg text-primary">${d.title}</h4>
+                <p class="text-sm font-semibold ${isBsx ? 't-magenta' : 'crl-blue'}">${d.role}</p>
+                <div class="mt-4 space-y-3 text-sm">
+                    <p><strong class="text-secondary">Core Priority:</strong> ${d.priority}</p>
+                    <p><strong class="text-secondary">Key Pain Point:</strong> ${d.pain}</p>
+                    <p><strong class="text-secondary">Strategic Approach:</strong> ${d.approach}</p>
+                </div>
+            </div>`).join('')}</div>`;
+        
+        createModal({
+            title: data.title,
+            subtitle: "Key Personas & Engagement Strategy",
+            colorClass: isBsx ? 't-magenta' : 'crl-blue',
+            borderColorClass: isBsx ? 't-magenta-border' : 'crl-blue-border',
+            bodyHTML
+        });
+    };
+
+    const createPersonaMatrixModal = (dossierType) => {
+        const data = STRATEGY_DATA.dossiers[dossierType].table;
+        const isBsx = dossierType === 'bsx';
+        const bodyHTML = `<div class="card border rounded-lg p-1 overflow-x-auto"><table class="w-full text-left text-sm">
+            <thead><tr class="border-b border-color text-secondary">${data.headers.map(h => `<th class="p-3 font-semibold">${h}</th>`).join('')}</tr></thead>
+            <tbody>${data.rows.map(r => `<tr class="border-b border-color last:border-0 hover:bg-[var(--bg)] transition-colors">${r.map((c, i) => `<td class="p-3 ${i===0 ? 'font-semibold text-primary' : ''}">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table></div>`;
+        createModal({
+            title: `Strategic Persona Matrix: ${isBsx ? 'Boston Scientific' : 'Charles River Labs'}`,
+            subtitle: "Targeted Engagement Blueprint",
+            colorClass: isBsx ? 't-magenta' : 'crl-blue',
+            borderColorClass: isBsx ? 't-magenta-border' : 'crl-blue-border',
+            widthClass: 'max-w-7xl',
+            bodyHTML
+        });
+    };
+    
+    const createMobilityModal = () => {
+        const data = STRATEGY_DATA.dossiers.bsx.mobility;
+        const bodyHTML = data.sections.map(section => `
+            <div class="mb-6">
+                <h4 class="font-bold text-xl text-primary flex items-center gap-3">${ICONS[section.icon]} ${section.title}</h4>
+                <div class="mt-4 space-y-4">${section.items.map(item => `
+                    <div class="card border rounded-lg p-4">
+                        <h5 class="font-semibold text-primary">${item.name}</h5>
+                        <p class="text-sm mt-1">${item.detail}</p>
+                    </div>
+                `).join('')}</div>
+            </div>
+        `).join('');
+
+        createModal({
+            title: data.title,
+            subtitle: data.subtitle,
+            colorClass: 't-magenta',
+            borderColorClass: 't-magenta-border',
+            widthClass: 'max-w-4xl',
+            bodyHTML
+        });
+    };
+    
+    const createRedemptionModal = () => {
+        const data = STRATEGY_DATA.dossiers.crl.redemption;
+        const bodyHTML = data.sections.map(section => `
+            <div class="mb-6">
+                <h4 class="font-bold text-xl text-primary flex items-center gap-3">${ICONS[section.icon]} ${section.title}</h4>
+                <div class="mt-4 space-y-4">${section.items.map(item => `
+                    <div class="card border rounded-lg p-4">
+                        <h5 class="font-semibold text-primary">${item.name}</h5>
+                        <p class="text-sm mt-1">${item.detail}</p>
+                    </div>
+                `).join('')}</div>
+            </div>
+        `).join('');
+         createModal({
+            title: data.title,
+            subtitle: data.subtitle,
+            colorClass: 'crl-blue',
+            borderColorClass: 'crl-blue-border',
+            widthClass: 'max-w-4xl',
+            bodyHTML
+        });
+    };
+    
+    const createIntelligenceModal = () => {
+        const data = STRATEGY_DATA.dossiers.crl.intelligence;
+        const bodyHTML = `<div class="grid md:grid-cols-2 gap-8">${data.links.map(company => `
+            <div>
+                <h4 class="text-xl font-bold text-primary flex items-center gap-3"><img src="${company.logo}" class="h-6 w-6 bg-white p-0.5 rounded-full" /> ${company.company}</h4>
+                <div class="mt-4 space-y-3">${company.items.map(item => `
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card border rounded-lg p-4 flex justify-between items-center hover:border-[var(--tmobile-magenta)] transition-colors">
+                        <span class="font-semibold text-primary">${item.label}</span>
+                        <svg class="w-5 h-5 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    </a>
+                `).join('')}</div>
+            </div>`).join('')}</div>`;
+        createModal({
+            title: data.title,
+            subtitle: data.subtitle,
+            colorClass: 'text-secondary',
+            borderColorClass: 'border-gray-500',
+            widthClass: 'max-w-4xl',
+            bodyHTML
+        });
+    };
+
+    const render = () => {
+        mainContent.innerHTML = STRATEGY_DATA.sections.map(createSectionHTML).join('');
+        sidebarNav.innerHTML = STRATEGY_DATA.sections.map(s => `
+            <li><a href="#${s.id}" class="nav-link flex items-center gap-3 p-2 rounded-md transition-colors hover:bg-[var(--border)]" data-section="${s.id}">
+                ${s.icon ? ICONS[s.icon] : `<img src="https://logo.clearbit.com/${s.id === 'bsx' ? 'bostonscientific.com' : 'criver.com'}" alt="${s.id} logo" class="h-5 w-5 bg-white p-0.5 rounded-sm"/>`}
+                <span class="font-semibold text-primary">${s.navLabel}</span></a></li>`).join('');
+        darkToggle.innerHTML = `${ICONS.Sun} ${ICONS.Moon}`;
+        presenterToggle.innerHTML = `${ICONS.Play}${ICONS.Pause}<span>Presenter Mode</span>`;
+        updateThemeUI();
+    };
+
+    const updateThemeUI = () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        darkToggle.querySelector('svg:first-child').style.display = isDark ? 'none' : 'block';
+        darkToggle.querySelector('svg:last-child').style.display = isDark ? 'block' : 'none';
+    };
+    
+    const updatePresenterUI = () => {
+        document.documentElement.classList.toggle('presenter-mode', state.isPresenterMode);
+        presenterToggle.querySelector('svg:first-child').style.display = state.isPresenterMode ? 'none' : 'inline-block';
+        presenterToggle.querySelector('svg:nth-child(2)').style.display = state.isPresenterMode ? 'inline-block' : 'none';
+        presenterControls.classList.toggle('opacity-0', !state.isPresenterMode);
+        presenterControls.classList.toggle('pointer-events-none', !state.isPresenterMode);
+    };
+
+    const handleScroll = () => {
+        let currentSectionIndex = 0;
+        STRATEGY_DATA.sections.forEach((section, index) => {
+            const el = document.getElementById(section.id);
+            if (el && window.scrollY >= el.offsetTop - 200) {
+                currentSectionIndex = index;
+            }
+        });
+
+        if (state.currentStep !== currentSectionIndex) {
+            state.activeSection = STRATEGY_DATA.sections[currentSectionIndex].id;
+            state.currentStep = currentSectionIndex;
+            sidebarNav.querySelectorAll('.nav-link').forEach(link => {
+                const isActive = link.dataset.section === state.activeSection;
+                link.classList.toggle('t-magenta-bg', isActive);
+                link.classList.toggle('text-white', isActive);
+            });
+        }
+    };
+    
+    const navigatePresenter = (direction) => {
+        const newStep = state.currentStep + direction;
+        if (newStep >= 0 && newStep < STRATEGY_DATA.sections.length) {
+            state.currentStep = newStep;
+            state.activeSection = STRATEGY_DATA.sections[newStep].id;
+            const targetElement = document.getElementById(state.activeSection);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    };
+
+    const init = () => {
+        render();
+        
+        document.body.addEventListener('click', e => {
+            const targetButton = e.target.closest('button');
+            if (!targetButton) return;
+
+            if (targetButton.matches('.accordion-trigger')) {
+                const content = targetButton.nextElementSibling;
+                targetButton.classList.toggle('open');
+                content.style.maxHeight = content.style.maxHeight ? null : `${content.scrollHeight}px`;
+            } 
+            else if (targetButton.dataset.dossier) createDossierModal(targetButton.dataset.dossier);
+            else if (targetButton.dataset.dossierTable) createPersonaMatrixModal(targetButton.dataset.dossierTable);
+            else if (targetButton.dataset.mobilityDossier) createMobilityModal();
+            else if (targetButton.dataset.redemptionDossier) createRedemptionModal();
+            else if (targetButton.dataset.intelligenceDossier) createIntelligenceModal();
+            else if (targetButton.id === 'dark-toggle') {
+                document.documentElement.classList.toggle('dark');
+                updateThemeUI();
+            }
+            else if (targetButton.id === 'presenter-toggle') {
+                state.isPresenterMode = !state.isPresenterMode;
+                if(state.isPresenterMode) handleScroll(); // Sync step before entering
+                updatePresenterUI();
+            }
+            else if (targetButton.id === 'presenter-prev-btn') navigatePresenter(-1);
+            else if (targetButton.id === 'presenter-next-btn') navigatePresenter(1);
+        });
+        
+        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('keydown', e => { 
+            if (e.key.toLowerCase() === 'd' && !e.metaKey && !e.ctrlKey) { e.preventDefault(); darkToggle.click(); }
+            if (e.key.toLowerCase() === 'p' && !e.metaKey && !e.ctrlKey) { e.preventDefault(); presenterToggle.click(); }
+            if(state.isPresenterMode) {
+                if(e.key === 'ArrowRight') { e.preventDefault(); navigatePresenter(1); }
+                if(e.key === 'ArrowLeft') { e.preventDefault(); navigatePresenter(-1); }
+            }
+        });
+
+        handleScroll();
+        const loaderBar = document.getElementById('loader-bar');
+        loaderBar.style.transition = 'transform 1s cubic-bezier(0.23, 1, 0.32, 1)';
+        setTimeout(() => { loaderBar.style.transform = 'scaleX(1)'; }, 100);
+        setTimeout(() => {
+            document.getElementById('loader').style.opacity = '0';
+            appContainer.style.opacity = '1';
+            document.querySelectorAll('.fade-in-up').forEach((el) => {
+                new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const delay = Array.from(entry.target.parentElement.children).indexOf(entry.target) * 100;
+                            entry.target.style.transitionDelay = `${delay}ms`;
+                            entry.target.classList.add('is-visible');
+                        }
+                    });
+                }, {threshold: 0.1}).observe(el);
+            });
+            setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+        }, 1200);
+
+        // Cursor gradient effect
+        const cursorGradient = document.querySelector('.cursor-gradient');
+        if (cursorGradient) {
+            window.addEventListener('mousemove', e => {
+                cursorGradient.style.setProperty('--mouse-x', `${e.clientX}px`);
+                cursorGradient.style.setProperty('--mouse-y', `${e.clientY}px`);
+            });
+        }
+    };
+
+    init();
+});
+</script>
+</body>
+</html>
+
