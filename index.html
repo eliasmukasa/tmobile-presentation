@@ -65,6 +65,9 @@
         .modal { backdrop-filter: blur(8px); }
         .modal-content { transition: transform 0.3s cubic-bezier(0.215, 0.610, 0.355, 1), opacity 0.3s ease; }
         
+        @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .ticker-animate { animation: ticker-scroll 35s linear infinite; }
+
         .accordion-content { overflow: hidden; transition: max-height 0.4s ease-in-out; }
         .accordion-trigger svg { transition: transform 0.3s ease; }
         .accordion-trigger.open svg { transform: rotate(180deg); }
@@ -72,19 +75,31 @@
         .loader-container { z-index: 100; transition: opacity 0.5s ease-out; }
         .loader-bar { transform-origin: left; }
         
+        /* Presenter Mode Styles */
         html.presenter-mode { scrollbar-width: none; }
         html.presenter-mode::-webkit-scrollbar { display: none; }
         .presenter-mode #sidebar-nav-container, .presenter-mode #header-container, .presenter-mode footer { display: none; }
-        
-        .cursor-gradient {
-            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(226, 0, 116, 0.1), transparent 80%);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            z-index: 1000;
+        .presenter-mode main { padding: 0 !important; }
+        .presenter-mode section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .presenter-mode section > div:first-child { /* Section Header */
+            justify-content: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .presenter-mode section > div:last-child { /* Section Content */
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 1024px;
+        }
+        .presenter-mode .accordion-item, .presenter-mode .accordion-trigger {
+            text-align: left;
         }
     </style>
 </head>
@@ -530,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const sectionIcon = section.icon ? `<span class="w-12 h-12 flex items-center justify-center rounded-lg card border">${ICONS[section.icon]}</span>` : '';
 
-        return `<section id="${section.id}" class="py-24 fade-in-up">
+        return `<section id="${section.id}" class="py-12 fade-in-up">
             <div class="flex items-center gap-4">
                 ${sectionIcon}
                 <div>
