@@ -65,9 +65,6 @@
         .modal { backdrop-filter: blur(8px); }
         .modal-content { transition: transform 0.3s cubic-bezier(0.215, 0.610, 0.355, 1), opacity 0.3s ease; }
         
-        @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .ticker-animate { animation: ticker-scroll 35s linear infinite; }
-
         .accordion-content { overflow: hidden; transition: max-height 0.4s ease-in-out; }
         .accordion-trigger svg { transition: transform 0.3s ease; }
         .accordion-trigger.open svg { transform: rotate(180deg); }
@@ -78,6 +75,17 @@
         html.presenter-mode { scrollbar-width: none; }
         html.presenter-mode::-webkit-scrollbar { display: none; }
         .presenter-mode #sidebar-nav-container, .presenter-mode #header-container, .presenter-mode footer { display: none; }
+        
+        .cursor-gradient {
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(226, 0, 116, 0.1), transparent 80%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -361,8 +369,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let subtitleHTML = '';
         
         if (section.id === 'intro') {
-            subtitleHTML = `<p class="mt-2 text-secondary">${STRATEGY_DATA.subtitle}</p>`;
-            contentHTML = `<p class="text-xl leading-relaxed max-w-4xl">${STRATEGY_DATA.intro.content}</p>`;
+            subtitleHTML = `<p class="mt-2 text-secondary text-center mx-auto max-w-4xl">${STRATEGY_DATA.subtitle}</p>`;
+            contentHTML = `<p class="text-xl leading-relaxed max-w-4xl text-center mx-auto">${STRATEGY_DATA.intro.content}</p>`;
         } else {
              switch(section.id) {
                 case 'methodology':
@@ -522,7 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const sectionIcon = section.icon ? `<span class="w-12 h-12 flex items-center justify-center rounded-lg card border">${ICONS[section.icon]}</span>` : '';
 
-        return `<section id="${section.id}" class="min-h-screen pt-24 pb-12 fade-in-up">
+        return `<section id="${section.id}" class="py-24 fade-in-up">
             <div class="flex items-center gap-4">
                 ${sectionIcon}
                 <div>
@@ -783,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             document.getElementById('loader').style.opacity = '0';
             appContainer.style.opacity = '1';
-            document.querySelectorAll('.fade-in-up').forEach((el) => {
+            document.querySelectorAll('.fade-in-up').forEach((el, index) => {
                 new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
