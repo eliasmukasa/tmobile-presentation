@@ -72,10 +72,9 @@
         .accordion-trigger svg { transition: transform 0.3s ease; }
         .accordion-trigger.open svg { transform: rotate(180deg); }
 
-        .loader-container { z-index: 100; transition: opacity 0.5s ease-out; }
+        .loader-container { z-index: 1000; transition: opacity 0.5s ease-out; }
         .loader-bar { transform-origin: left; }
         
-        /* Presenter Mode Styles */
         html.presenter-mode { scrollbar-width: none; }
         html.presenter-mode::-webkit-scrollbar { display: none; }
         .presenter-mode #sidebar-nav-container, .presenter-mode #header-container, .presenter-mode footer { display: none; }
@@ -87,12 +86,13 @@
             min-height: 100vh;
             padding: 2rem;
         }
-        .presenter-mode section > div:first-child { /* Section Header */
+        .presenter-mode .section-header {
             justify-content: center;
+            text-align: center;
             margin-left: auto;
             margin-right: auto;
         }
-        .presenter-mode section > div:last-child { /* Section Content */
+        .presenter-mode .section-content {
             text-align: center;
             margin-left: auto;
             margin-right: auto;
@@ -100,6 +100,17 @@
         }
         .presenter-mode .accordion-item, .presenter-mode .accordion-trigger {
             text-align: left;
+        }
+        
+        .cursor-gradient {
+            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(226, 0, 116, 0.1), transparent 80%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -209,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]},
                 { name: "External Intelligence & Value Hypotheses", icon: 'Search', bullets: ["Perform a detailed analysis of the last 2-3 years of financial filings (10-K forms), investor day presentations, and corporate responsibility reports for both companies to surface executive-backed strategic imperatives.", "Formulate concise, powerful Value Hypotheses for each account to frame the entire engagement strategy."], notes: [ { label: "BSX Value Hypothesis", text: "T‑Mobile's nationwide 5G fabric will connect BSX's innovation engine (IoMT, clinical trials) with its operational excellence engine (smart factories, resilient supply chain) to drive both improved patient outcomes and enhanced shareholder value." }, { label: "CRL Value Hypothesis", text: "T‑Mobile's Advanced Network Solutions will power CRL's 'Lab of the Future'—providing the speed, security, and reliability required to help shave a year off the drug development lifecycle." } ], dossierTriggers: ['intelligence-dossier-trigger'] },
                 { name: "Stakeholder Mapping & Persona Dossiers", icon: 'Map', bullets: ["Systematically identify and categorize all potential stakeholders into four primary groups: Decision‑Makers, Influencers, Users, and Blockers.", "Develop detailed Target Persona Dossiers for Boston Scientific (expansion) and Charles River Labs (acquisition), moving beyond titles to understand individual motivations and pain points."], dossierTriggers: ['bsx-dossier-trigger', 'crl-dossier-trigger'] },
-                { name: "Initial Credibility Plays", icon: 'Shield', bullets: ["For Boston Scientific, execute a 'listening tour' introduction with the incumbent T-Mobile team to understand history and challenges, with the goal of expanding from a single persona to at least 5-7 key stakeholders.", "For Charles River Labs, reframe the conversation completely away from the lost RFP. The new, value-based introduction will leverage a relevant case study, such as the VA's secure telehealth program, to engage new digital transformation leaders."] }
+                { name: "Initial Credibility Plays & Exit Criteria", icon: 'Shield', bullets: ["**Exit Criteria:** The primary goal for this 30-day phase is to secure 5-7 initial meetings across both accounts, spanning both existing contacts and newly identified strategic stakeholders.", "For Boston Scientific, execute a 'listening tour' to expand from a single persona to a multi-threaded relationship across at least 5-7 key contacts.", "For Charles River Labs, reframe the conversation completely away from the lost RFP with a value-based introduction, leveraging a relevant case study like the VA's secure telehealth program."] }
             ]
         },
         bsx: {
@@ -385,19 +396,19 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (section.id === 'intro') {
             subtitleHTML = `<p class="mt-2 text-secondary text-center mx-auto max-w-4xl">${STRATEGY_DATA.subtitle}</p>`;
-            contentHTML = `<p class="text-xl leading-relaxed max-w-4xl text-center mx-auto">${STRATEGY_DATA.intro.content}</p>`;
+            contentHTML = `<div class="section-content"><p class="text-xl leading-relaxed max-w-4xl text-center mx-auto">${STRATEGY_DATA.intro.content}</p></div>`;
         } else {
              switch(section.id) {
                 case 'methodology':
-                    contentHTML = `<div class="grid md:grid-cols-3 gap-6">${STRATEGY_DATA.methodology.phases.map(p => `
+                    contentHTML = `<div class="section-content"><div class="grid md:grid-cols-3 gap-6">${STRATEGY_DATA.methodology.phases.map(p => `
                         <div class="card border rounded-lg p-6 group hover:-translate-y-1 hover:shadow-2xl">
                             <h3 class="font-bold text-xl text-primary flex items-center gap-2">${ICONS.Timer} ${p.days}</h3>
                             <h4 class="font-semibold text-lg text-primary mt-2">${p.title}</h4>
                             <p class="mt-2 text-base">${p.description}</p>
-                        </div>`).join('')}</div>`;
+                        </div>`).join('')}</div></div>`;
                     break;
                 case 'foundation-deep-dive':
-                    contentHTML = `<p class="max-w-4xl text-lg mb-8">${STRATEGY_DATA.foundationDeepDive.description}</p>
+                    contentHTML = `<div class="section-content"><p class="max-w-4xl text-lg mb-8">${STRATEGY_DATA.foundationDeepDive.description}</p>
                     <div class="max-w-4xl space-y-4">${STRATEGY_DATA.foundationDeepDive.pillars.map(p => {
                         const dossierTriggersHTML = p.dossierTriggers ? `<div class="mt-4 flex flex-col sm:flex-row gap-3">${p.dossierTriggers.map(id => {
                             if(id.includes('intelligence')) {
@@ -426,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     ${dossierTriggersHTML}
                                 </div>
                             </div>
-                        </div>`}).join('')}</div>`;
+                        </div>`}).join('')}</div></div>`;
                     break;
                 case 'bsx':
                 case 'crl':
@@ -461,12 +472,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const mobilityButton = isBsx ? `<div class="mt-6"><button data-mobility-dossier="bsx" class="w-full text-center py-3 px-4 t-magenta-bg text-white font-bold rounded-lg hover:opacity-90 transition text-lg flex items-center justify-center gap-2">${ICONS.Rocket} View Mobility & Quick Win Roadmap</button></div>` : '';
                     const redemptionButton = !isBsx ? `<div class="mt-6"><button data-redemption-dossier="crl" class="w-full text-center py-3 px-4 crl-blue-bg text-white font-bold rounded-lg hover:opacity-90 transition text-lg flex items-center justify-center gap-2">${ICONS.Shield} View Redemption Arc Roadmap</button></div>` : '';
 
-                    contentHTML = `${currentHTML}${narrativeHTML}<h3 class="text-2xl font-bold text-primary mb-4">Three-Pronged Strategy</h3><div class="space-y-6">${prongsHTML}</div>
+                    contentHTML = `<div class="section-content">${currentHTML}${narrativeHTML}<h3 class="text-2xl font-bold text-primary mb-4">Three-Pronged Strategy</h3><div class="space-y-6">${prongsHTML}</div>
                     <div class="mt-8"><button data-dossier-table="${section.id}" class="w-full text-center py-3 px-4 ${isBsx ? 't-magenta-bg' : 'crl-blue-bg'} text-white font-bold rounded-lg hover:opacity-90 transition text-lg">View Strategic Persona Matrix</button></div>
-                    ${mobilityButton}${redemptionButton}`;
+                    ${mobilityButton}${redemptionButton}</div>`;
                     break;
                  case 'accelerator':
-                    contentHTML = `<p class="max-w-4xl text-lg mb-8">${STRATEGY_DATA.accelerator.description}</p>
+                    contentHTML = `<div class="section-content"><p class="max-w-4xl text-lg mb-8">${STRATEGY_DATA.accelerator.description}</p>
                         <div class="grid lg:grid-cols-2 gap-8">
                             <div class="card border rounded-lg p-6 group hover:-translate-y-1 hover:shadow-2xl">
                                 <h3 class="text-2xl font-bold text-primary mb-4 flex items-center gap-3"><img src="https://logo.clearbit.com/bostonscientific.com" alt="BSX Logo" class="h-8 w-8 bg-white p-1 rounded-full"/> ${STRATEGY_DATA.accelerator.bsx.title}</h3>
@@ -482,10 +493,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <h4 class="font-semibold text-primary mt-4">Success Metric (KPI):</h4>
                                 <p class="mt-1">${STRATEGY_DATA.accelerator.crl.kpi}</p>
                             </div>
-                        </div>`;
+                        </div></div>`;
                     break;
                 case 'impact':
-                    contentHTML = `<div class="grid lg:grid-cols-2 gap-8">
+                    contentHTML = `<div class="section-content"><div class="grid lg:grid-cols-2 gap-8">
                             <div>
                                 <h3 class="text-2xl font-bold text-primary mb-4 flex items-center gap-3"><img src="https://logo.clearbit.com/bostonscientific.com" alt="BSX Logo" class="h-8 w-8 bg-white p-1 rounded-full"/> Boston Scientific Outcomes</h3>
                                 <div class="space-y-4">
@@ -520,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>`;
+                        </div></div>`;
                     break;
                 case 'summary':
                     const summaryTable = `<div class="card border rounded-lg p-1 overflow-x-auto"><table class="w-full text-left">
@@ -533,10 +544,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td class="p-4 font-semibold text-primary">${r.outcome}</td>
                         </tr>`).join('')}</tbody>
                     </table></div>`;
-                    contentHTML = summaryTable;
+                    contentHTML = `<div class="section-content">${summaryTable}</div>`;
                     break;
                 case 'conclusion':
-                     contentHTML = `<p class="text-xl leading-relaxed max-w-4xl">${STRATEGY_DATA.conclusion.content}</p>`;
+                     contentHTML = `<div class="section-content"><p class="text-xl leading-relaxed max-w-4xl">${STRATEGY_DATA.conclusion.content}</p></div>`;
                     break;
             }
         }
@@ -546,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sectionIcon = section.icon ? `<span class="w-12 h-12 flex items-center justify-center rounded-lg card border">${ICONS[section.icon]}</span>` : '';
 
         return `<section id="${section.id}" class="py-12 fade-in-up">
-            <div class="flex items-center gap-4">
+            <div class="section-header flex items-center gap-4">
                 ${sectionIcon}
                 <div>
                      <h2 class="text-3xl lg:text-4xl font-black text-primary tracking-tighter">${titleHTML}</h2>
@@ -731,7 +742,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentSectionIndex = 0;
         STRATEGY_DATA.sections.forEach((section, index) => {
             const el = document.getElementById(section.id);
-            if (el && window.scrollY >= el.offsetTop - 200) {
+            if (el && window.scrollY >= el.offsetTop - window.innerHeight / 3) {
                 currentSectionIndex = index;
             }
         });
@@ -806,7 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             document.getElementById('loader').style.opacity = '0';
             appContainer.style.opacity = '1';
-            document.querySelectorAll('.fade-in-up').forEach((el, index) => {
+            document.querySelectorAll('.fade-in-up').forEach((el) => {
                 new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
